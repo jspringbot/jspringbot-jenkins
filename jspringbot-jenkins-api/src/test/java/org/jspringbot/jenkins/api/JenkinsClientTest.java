@@ -16,7 +16,7 @@ import java.util.Map;
 
 import static junit.framework.Assert.*;
 
-//@Ignore
+@Ignore
 public class JenkinsClientTest {
 
     public static final int MAX_FETCH_JOB_DETAILS_COUNT = 5;

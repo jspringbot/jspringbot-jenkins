@@ -15,6 +15,23 @@
   <packaging>jar</packaging>
   <name>jspringbot-jenkins-api</name>
 
+  <distributionManagement>
+    <repository>
+      <id>sonatype-nexus-staging</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+    <snapshotRepository>
+      <id>sonatype-nexus-snapshots</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+    </snapshotRepository>
+  </distributionManagement>
+
+  <scm>
+    <connection>scm:git:https://github.com/jspringbot/jspringbot-jenkins-api.git</connection>
+    <url>scm:git:https://github.com/jspringbot/jspringbot-jenkins-api.git</url>
+    <developerConnection>scm:git:https://github.com/jspringbot/jspringbot-jenkins-api.git</developerConnection>
+  </scm>
+
   <build>
     <defaultGoal>install</defaultGoal>
     <plugins>
