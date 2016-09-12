@@ -159,6 +159,7 @@ public class JenkinsClient {
     private StatusOnlyHttpInvoker createPostStatusInvoker(int status) {
         StatusOnlyHttpInvoker invoker = new StatusOnlyHttpInvoker(client, context, targetHost, false);
         invoker.setHttpStatus(status);
+        invoker.addHeader(new BasicHeader("Jenkins-Crumb", crumb.getCrumb()));
 
         return invoker;
     }
@@ -255,7 +256,6 @@ public class JenkinsClient {
         }
 
         StatusOnlyHttpInvoker retriever = createPostStatusInvoker(HttpStatus.SC_MOVED_TEMPORARILY);
-        retriever.addHeader(new BasicHeader("Jenkins-Crumb", crumb.getCrumb()));
 
         if(MapUtils.isNotEmpty(parameters)) {
             for(Map.Entry<String, String> entry : parameters.entrySet()) {
