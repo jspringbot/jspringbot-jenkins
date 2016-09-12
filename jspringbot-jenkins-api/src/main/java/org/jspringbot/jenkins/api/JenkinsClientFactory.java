@@ -52,8 +52,19 @@ public final class JenkinsClientFactory {
 
 
     public static JenkinsClient create(String path) throws IOException {
-        return create(path, null, 2, 2);
+        JenkinsClient jenkinsClient = create(path, null, 2, 2);
+        jenkinsClient.init();
+
+        return jenkinsClient;
     }
+
+    public static JenkinsClient createWithCredentials(String path, String username, String password) throws IOException {
+        JenkinsClient jenkinsClient = create(path, null, 2, 2);
+        jenkinsClient.authenticate(username, password);
+        jenkinsClient.init();
+        return jenkinsClient;
+    }
+
 
     public static JenkinsClient create(String path, String contextPath) throws IOException {
         return create(path, contextPath, 2, 2);

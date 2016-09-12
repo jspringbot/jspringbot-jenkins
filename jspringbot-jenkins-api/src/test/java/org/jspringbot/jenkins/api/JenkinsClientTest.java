@@ -16,12 +16,12 @@ import java.util.Map;
 
 import static junit.framework.Assert.*;
 
-@Ignore
+//@Ignore
 public class JenkinsClientTest {
 
     public static final int MAX_FETCH_JOB_DETAILS_COUNT = 5;
     
-    public static final String DISABLE_ENABLE_JOB_NAME = "testjob";
+    public static final String DISABLE_ENABLE_JOB_NAME = "domain-check-ek35";
 
     public static final String CONFIG_TEST_JOB_NAME = "sample";
     
@@ -29,11 +29,15 @@ public class JenkinsClientTest {
     
     public static final String ALT_SVN_PATH_2 = "http://svn.host/repo/trunk/path2";
 
-    public static final String HUDSON_URL = "http://jenkin.host:8080/";
+    public static final String HUDSON_URL = "http://192.168.33.20:8080/";
+
+    private JenkinsClient createClient() throws Exception {
+        return JenkinsClientFactory.create(HUDSON_URL);
+    }
 
     @Test
     public void testJobDetailsAndBuildDetails() throws Exception {
-        JenkinsClient client = JenkinsClientFactory.create(HUDSON_URL);
+        JenkinsClient client = createClient();
 
         assertNotNull(client.getNode());
         
@@ -56,7 +60,7 @@ public class JenkinsClientTest {
 
     @Test
     public void testJobDetailsWithUpstream() throws Exception {
-        JenkinsClient client = JenkinsClientFactory.create(HUDSON_URL);
+        JenkinsClient client = createClient();
 
         assertNotNull(client.getNode());
 
@@ -66,8 +70,8 @@ public class JenkinsClientTest {
     }
     
     @Test
-    public void testBuild() throws IOException, InterruptedException {
-        JenkinsClient client = JenkinsClientFactory.create(HUDSON_URL);
+    public void testBuild() throws Exception {
+        JenkinsClient client = createClient();
 
         if(!client.build(DISABLE_ENABLE_JOB_NAME, true)) {
             System.out.println("unable to build maybe disabled or currently building.");
@@ -76,11 +80,13 @@ public class JenkinsClientTest {
             JobDetails details = client.getJobDetails(DISABLE_ENABLE_JOB_NAME, false);
             assertTrue("should be buildable.", details.getBuildable());
         }
+
+        // --auth-no-challenge
         
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.put("sample", "value");
 
-        assertTrue("unable to build.", client.build(DISABLE_ENABLE_JOB_NAME, parameters));
+        assertTrue("unable to build.", client.build(DISABLE_ENABLE_JOB_NAME));
 
         client.waitTillAllBuildsDone(DISABLE_ENABLE_JOB_NAME);
         client.disable(DISABLE_ENABLE_JOB_NAME);

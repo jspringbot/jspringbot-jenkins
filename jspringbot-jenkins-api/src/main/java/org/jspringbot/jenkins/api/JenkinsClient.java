@@ -13,6 +13,7 @@ import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.AbstractHttpClient;
 import org.apache.http.impl.client.BasicAuthCache;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HttpContext;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -43,6 +44,8 @@ public class JenkinsClient {
 
     private static final String BUILD_PATH = "/build";
 
+    private static final String CRUMB_PATH = "/crumbIssuer/api/json";
+
     private static final String BUILD_WITH_PARAMETERS_PATH = "/buildWithParameters";
 
     public static final long DEFAULT_TIME_OUT_IN_MILLIS = 1000l * 60l * 60l;
@@ -71,6 +74,8 @@ public class JenkinsClient {
 
     private String contextPath;
 
+    private Crumb crumb;
+
     public JenkinsClient(AbstractHttpClient client, HttpContext context, ObjectMapper mapper, URI baseUri) throws IOException {
         this(client, context, mapper, baseUri, null);
     }
@@ -82,9 +87,9 @@ public class JenkinsClient {
         this.contextPath = contextPath;
         this.targetHost = new HttpHost(baseUri.getHost(), baseUri.getPort(), baseUri.getScheme());
 
-        init();
+        //init();
 
-        Validate.notNull(jobsCache, String.format("No jobs found for uri %s", baseUri.toString()));
+//        Validate.notNull(jobsCache, String.format("No jobs found for uri %s", baseUri.toString()));
     }
 
     public void authenticate(String username, String password) {
@@ -118,7 +123,14 @@ public class JenkinsClient {
         this.contextPath = contextPath;
     }
 
-    private void init() throws IOException {
+    private void initCrumbs() throws IOException {
+        GetJsonObject<Crumb> retriever = createObjectRetriever(Crumb.class);
+
+        crumb = retriever.getObject(getPath(CRUMB_PATH));
+    }
+
+    void init() throws IOException {
+        initCrumbs();
         GetJsonObject<Node> retriever = createObjectRetriever(Node.class);
 
         node = retriever.getObject(getPath(API_JSON_PATH));
@@ -243,6 +255,7 @@ public class JenkinsClient {
         }
 
         StatusOnlyHttpInvoker retriever = createPostStatusInvoker(HttpStatus.SC_MOVED_TEMPORARILY);
+        retriever.addHeader(new BasicHeader("Jenkins-Crumb", crumb.getCrumb()));
 
         if(MapUtils.isNotEmpty(parameters)) {
             for(Map.Entry<String, String> entry : parameters.entrySet()) {

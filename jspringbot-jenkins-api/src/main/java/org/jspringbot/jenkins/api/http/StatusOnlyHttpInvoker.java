@@ -51,6 +51,8 @@ public class StatusOnlyHttpInvoker extends AbstractHttpInvoker {
             responseEntity = response.getEntity();
             receivedStatus = status.getStatusCode();
 
+            LOG.info("Status:" + status);
+
             return receivedStatus == httpStatus;
         } finally {
             EntityUtils.consume(responseEntity);
